@@ -31,7 +31,7 @@ endif()
 
 # Since soci is not installed, need to find the library and header myself.
 find_path(SOCI_INCLUDE_DIRECTORY
-  NAMES soci/soci.h soci/soci-backend.h soci-sqlite3.h
+  NAMES soci/soci.h soci/soci-backend.h soci/sqlite3/soci-sqlite3.h
   PATHS ${CMAKE_CURRENT_BINARY_DIR}/soci-build
   PATH_SUFFIXES include
   DOC "SOCI include directory"
@@ -69,4 +69,8 @@ endif()
 
 if(NOT SOCI_EMPTY_LIBRARY)
   message(FATAL_ERROR "SOCI_EMPTY_LIBRARY is not found.")
+endif()
+
+if(NOT SOCI_SQLITE3_LIBRARY)
+  message(FATAL_ERROR "SOCI_SQLITE3_LIBRARY is not found.")
 endif()

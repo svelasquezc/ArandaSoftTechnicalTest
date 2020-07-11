@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.13.0)
 
-project(ArandaTechTest VERSION 1.0
+project(ArandaTechTask VERSION 1.0
   DESCRIPTION "C++ ArandaSoft Technical Test"
   LANGUAGES CXX C)
 
@@ -8,6 +8,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_CURRENT_
 
 set(CMAKE_CXX_STANDARD 17) 
 
+link_libraries(${CMAKE_DL_LIBS})
 
 #For external dependencies
 
@@ -26,7 +27,7 @@ add_executable(${PROJECT_NAME})
 
 
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include ${SOCI_INCLUDE_DIRECTORY}) 
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include) 
 
 add_subdirectory(src)
 
@@ -39,9 +40,9 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
   include(GoogleTest)
 endif()
 
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
+#if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
   add_subdirectory(tests)
-endif()
+#endif()
 
 
 # Report a complete summary of configuration

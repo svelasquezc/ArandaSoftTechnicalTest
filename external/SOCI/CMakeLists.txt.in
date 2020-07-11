@@ -17,7 +17,7 @@ ExternalProject_Add(soci
                     "-DWITH_BOOST=OFF" "-DWITH_DB2=OFF" "-DWITH_ODBC=OFF"
                     "-DWITH_ORACLE=OFF" "-DWITH_MYSQL=OFF"
                     "-DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIRECTORY}"
-                    "-DSQLITE3_LIBRARY=${SQLITE_INCLUDE_DIRECTORY}"
+                    "-DSQLITE3_LIBRARY=${SQLITE_LIBRARY}"
   BUILD_COMMAND     "${CMAKE_COMMAND}" --build .
   UPDATE_COMMAND    ""
   PATCH_COMMAND     ""
