@@ -25,13 +25,15 @@ include_directories(${SQLITE_INCLUDE_DIRECTORY} ${SOCI_INCLUDE_DIRECTORY} ${gtes
 
 add_executable(${PROJECT_NAME})
 
+add_library(OSSysInfo STATIC)
 
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include) 
+target_include_directories(OSSysInfo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_subdirectory(src)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ${SOCI_CORE_LIBRARY} ${SOCI_SQLITE3_LIBRARY} ${SQLITE_LIBRARY})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${SOCI_CORE_LIBRARY} ${SOCI_SQLITE3_LIBRARY} ${SQLITE_LIBRARY} OSSysInfo)
 
 
 enable_testing()

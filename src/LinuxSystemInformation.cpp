@@ -1,45 +1,62 @@
 #include "LinuxSystemInformation.hpp"
 
-
 #ifdef __linux__
-#include <sys/sysinfo.h>
+#include <unistd.h>
+#include <stdint.h>
 #include <cpuid.h>
 #include <thread>
+#include <sys/sysinfo.h>
 
-void LinuxSystemInformation::getInfo() override{
+//Taken from https://stackoverflow.com/questions/6491566/getting-the-machine-serial-number-and-cpu-id-using-c-c-in-linux
 
-    _coresNumber = sysconf(_SC_NPROCESSORS_CONF);
+struct CPUVendorID {
+    unsigned int ebx;
+    unsigned int edx;
+    unsigned int ecx;
+
+    std::string toString() const {
+        return std::string(reinterpret_cast<const char *>(this), 12);
+    }
+};
+
+template<class DatabaseHandler>
+void LinuxSystemInformation<DatabaseHandler>::getInfo(){
+
+    this->_coresNumber = sysconf(_SC_NPROCESSORS_CONF);
+
+    //Taken from https://stackoverflow.com/questions/6491566/getting-the-machine-serial-number-and-cpu-id-using-c-c-in-linux
     
     {
-        char CPUBrandString[0x40];
-        unsigned int CPUInfo[4] = {0,0,0,0};
+        unsigned int level = 0;
+        unsigned int eax = 0;
+        unsigned int ebx;
+        unsigned int ecx;
+        unsigned int edx;
 
-        __cpuid(0x80000000, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
-        unsigned int nExIds = CPUInfo[0];
+        __get_cpuid(level, &eax, &ebx, &ecx, &edx);
 
-        memset(CPUBrandString, 0, sizeof(CPUBrandString));
+        CPUVendorID vendorID { .ebx = ebx, .edx = edx, .ecx = ecx };
 
-        for (unsigned int i = 0x80000000; i <= nExIds; ++i){
-            __cpuid(i, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
+        this->_processorBrand = vendorID.toString();
+    };
 
-            if (i == 0x80000002)
-                memcpy(CPUBrandString, CPUInfo, sizeof(CPUInfo));
-            else if (i == 0x80000003)
-                memcpy(CPUBrandString + 16, CPUInfo, sizeof(CPUInfo));
-            else if (i == 0x80000004)
-                memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
-        }
+    this->_threadsNumber = static_cast<unsigned int>(std::thread::hardware_concurrency());
 
-        _processorName(CPUBrandString);
-    }
-
-    _threadsNumber = static_assert<unsigned int>(std::thread::hardware_concurrency());
-
+    //Taken from: https://stackoverflow.com/questions/43481494/total-ram-size-linux-sysinfo-vs-proc-meminfo
     
+    struct sysinfo memory_info;
+
+    this->_totalRam  = ((unsigned long long) memory_info.totalram * memory_info.mem_unit)/1024;
+    this->_freeRam   = ((unsigned long long) memory_info.freeram * memory_info.mem_unit)/1024;
+    this->_busyRam   = this->_totalRam - this->_freeRam; 
+    this->_sharedRam = ((unsigned long long) memory_info.totalram * memory_info.mem_unit)/1024;
     
 };
 #else
-void LinuxSystemInformation::getInfo() override{
-    std::err << "Not implemented\n";
+#include <stdexcept>
+#include <string>
+template<class DatabaseHandler>
+void LinuxSystemInformation<DatabaseHandler>::getInfo(){
+    throw std::runtime_error(std::string("Not implemented in this OS"));
 };
 #endif

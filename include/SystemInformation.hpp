@@ -1,36 +1,18 @@
 #ifndef SYSTEM_INFORMATION_HPP
 #define SYSTEM_INFORMATION_HPP
 
-#include "SystemInformationInterface.hpp"
-
-#include <string>
-
-template<class DerivedSystemInformation>
-class SystemInformation : public SystemInformationInterface{
-
+#include <memory>
+template<class DatabaseHandler>
+class SystemInformation{
 private:
+
+    std::shared_ptr<DatabaseHandler> dbmanager;
     
-    std::string _processorName;
-    unsigned int _coresNumber;
-    unsigned int _threadsNumber;
-    unsigned int _cache;
-    unsigned long _totalRam;
-    unsigned long _freeRam;
-    unsigned long _sharedRam;
-    unsigned long _bufferRam;
-
-    
-    
-    friend class DerivedSystemInformation;
-
-
-    //Methods
-    SystemInformation(){};
-    const DerivedSystemInformation* derived();
-    virtual void getInfo() = 0;
-
 public:
-    template<class DatabaseHandler>
-    void info(DatabaseHandler& sql) override;
+    
+    virtual void info() = 0;
 };
+template<class DatabaseHandler>
+std::unique_ptr<SystemInformation<DatabaseHandler>> makeSystemInformation();
+
 #endif /* SYSTEM_INFORMATION_HPP */
