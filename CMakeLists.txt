@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 link_libraries(${CMAKE_DL_LIBS})
 
-#For external dependencies
+#External Dependencies are added using ExternalProject_Add, with the CMake scripts on those folders
 
 add_subdirectory(external/SQLite3)
 
@@ -19,21 +19,17 @@ add_subdirectory(external/SOCI)
 add_subdirectory(external/googletest)
 
 
-include_directories(${SQLITE_INCLUDE_DIRECTORY} ${SOCI_INCLUDE_DIRECTORY} ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+include_directories(${SQLITE_INCLUDE_DIRECTORY} ${SOCI_INCLUDE_DIRECTORY} ${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 #configure_file(config.h.in config.h)
 
 
 add_executable(${PROJECT_NAME})
 
-add_library(OSSysInfo STATIC)
-
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-target_include_directories(OSSysInfo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_subdirectory(src)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ${SOCI_CORE_LIBRARY} ${SOCI_SQLITE3_LIBRARY} ${SQLITE_LIBRARY} OSSysInfo)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${SOCI_CORE_LIBRARY} ${SOCI_SQLITE3_LIBRARY} ${SQLITE_LIBRARY})
 
 
 enable_testing()
